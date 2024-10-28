@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "haproxy-redis-sentinel"
+version = "0.1.0"
+description = ""
+authors = ["Muhammed Hussein Karimi <info@karimi.dev>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+typer = "^0.12.5"
+redis = "^5.2.0"
+six = "^1.16.0"
+
+[tool.poetry.scripts]
+haproxy-redis-sentinel = "haproxy_redis_sentinel.cli:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

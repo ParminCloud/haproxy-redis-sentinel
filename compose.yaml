@@ -1,0 +1,22 @@
+services:
+  haproxy:
+    image: docker.io/library/haproxy:bookworm
+    restart: always
+    ports:
+      - 6379:6379
+    user: root # Required for unix socket listen
+    volumes:
+      - /tmp/haproxy/socket/:/var/run/haproxy/
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+
+  haproxy-redis-sentinel:
+    image: ghcr.io/parmincloud/haproxy-redis-sentinel:master
+    restart: always
+    volumes:
+      - /tmp/haproxy/socket/:/var/run/haproxy/
+    environment:
+      SENTINEL_PASSWORD: ""
+      SENTINEL_HOST: ""
+      SENTINEL_PORT: ""
+      MASTER_NAME: "mymaster"
+      ## No need to set HAProxy variables, defaults are working here
