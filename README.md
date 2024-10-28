@@ -75,6 +75,8 @@ HAProxy is a great TCP Proxy and LoadBalancer with high performance
 
 But It's not able be live in master changes, Using Runtime API we are able to configure that programmatically
 
+Unlike similar projects that they wrote a TCP Proxy from zero, We don't want to write Wheel from zero we are using the Power of HAProxy :)
+
 With the help of Redis Pub/Sub we are able to understand master changes live that propagate changes to HAProxy By disconnecting all of the connections and changing server address accordingly
 
 ## TODO
