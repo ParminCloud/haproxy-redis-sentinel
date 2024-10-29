@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "haproxy-redis-sentinel.labels" . | nindent 4 }}
+  name: {{ include "haproxy-redis-sentinel.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "haproxy-redis-sentinel.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "haproxy-redis-sentinel.fullname" . }}
+    spec:
+      containers:
+        - name: haproxy
+          image: {{ .Values.haproxy.image.repository }}:{{ .Values.haproxy.image.tag }}
+          imagePullPolicy: {{ .Values.haproxy.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.haproxy.service.port }}
+          volumeMounts:
+            - name: haproxy-socket
+              mountPath: /var/run/haproxy/
+            - name: haproxy-config
+              mountPath: /usr/local/etc/haproxy/haproxy.cfg
+              subPath: haproxy.cfg
+          securityContext:
+            runAsUser: 0
+
+        - name: haproxy-redis-sentinel
+          image: {{ .Values.haproxyRedisSentinel.image.repository }}:{{ .Values.haproxyRedisSentinel.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.haproxyRedisSentinel.image.pullPolicy }}
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          env:
+            - name: SENTINEL_PASSWORD
+              value: {{ .Values.haproxyRedisSentinel.sentinel.password }}
+            - name: SENTINEL_HOST
+              value: {{ .Values.haproxyRedisSentinel.sentinel.host }}
+            - name: SENTINEL_PORT
+              value: {{ .Values.haproxyRedisSentinel.sentinel.port }}
+            - name: MASTER_NAME
+              value: {{ .Values.haproxyRedisSentinel.sentinel.masterName }}
+          volumeMounts:
+            - name: haproxy-socket
+              mountPath: /var/run/haproxy/
+
+      volumes:
+        - name: haproxy-socket
+          emptyDir: {}
+        - name: haproxy-config
+          configMap:
+            name: haproxy-config

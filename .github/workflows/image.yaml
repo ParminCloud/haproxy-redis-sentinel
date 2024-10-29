@@ -3,7 +3,9 @@ name: Container Image
 on:
   push:
     branches: ["master"]
-
+  release:
+    types:
+      - published
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}

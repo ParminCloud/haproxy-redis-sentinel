@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "haproxy-redis-sentinel.labels" . | nindent 4 }}
+  name: {{ include "haproxy-redis-sentinel.fullname" . }}
+data:
+  haproxy.cfg: |
+    global
+      stats socket /var/run/haproxy/haproxy.sock user haproxy group haproxy mode 660 level admin
+      stats timeout 2m
+
+    frontend redis_master
+      bind *:637
+      balance source
+      hash-type consistent
+

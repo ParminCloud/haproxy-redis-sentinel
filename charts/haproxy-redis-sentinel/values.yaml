@@ -1,0 +1,23 @@
+replicaCount: 1
+
+haproxy:
+  image:
+    repository: docker.io/library/haproxy
+    tag: bookworm
+    pullPolicy: "IfNotPresent"
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 6379
+
+haproxyRedisSentinel:
+  image:
+    repository: ghcr.io/parmincloud/haproxy-redis-sentinel
+    tag: ""
+    pullPolicy: "IfNotPresent"
+  sentinel:
+    password: ""
+    host: ""
+    port: ""
+    masterName: "mymaster"
+

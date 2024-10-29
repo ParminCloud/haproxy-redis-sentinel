@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "haproxy-redis-sentinel.labels" . | nindent 4 }}
+  name: {{ include "haproxy-redis-sentinel.fullname" . }}
+spec:
+  type: {{ .Values.haproxy.service.type }}
+  ports:
+    - port: {{ .Values.haproxy.service.port }}
+      targetPort: redis
+      protocol: TCP
+      name: redis
+  selector:
+    {{- include "haproxy-redis-sentinel.selectorLabels" . | nindent 4 }}
