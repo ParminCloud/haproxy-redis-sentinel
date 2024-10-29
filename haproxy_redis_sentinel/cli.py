@@ -1,79 +1,22 @@
-import typer
-from rich.console import Console
-from datetime import datetime
-import redis
-from redis.retry import Retry
+from enum import StrEnum
+from haproxy_redis_sentinel.logging import info
+from haproxy_redis_sentinel.utils import send_command
 from redis.backoff import ExponentialBackoff
+from redis.retry import Retry
 from typing import Annotated, Any
-import socket
+import redis
+import typer
+
 
 __all__ = ["app"]
 
 app = typer.Typer()
 
-err_console = Console(stderr=True)
-out_console = Console(stderr=False)
 
-
-def encode_command(command: str) -> bytes:
-    return f"{command};\n".encode("utf-8")
-
-
-def log_prefix() -> str:
-    return f"{datetime.now().strftime("%c")} "
-
-
-def info(msg):
-    typer.echo(
-        log_prefix() + typer.style(
-            msg,
-            fg=typer.colors.GREEN,
-            bold=True
-        ),
-        err=False
-    )
-
-
-def error(msg: str):
-    typer.echo(
-        log_prefix() + typer.style(
-            msg,
-            fg=typer.colors.WHITE,
-            bg=typer.colors.RED,
-            bold=True
-        ),
-        err=True
-    )
-
-
-def recvall(sock: socket.socket):
-    BUFF_SIZE = 1024
-    data = b''
-    while True:
-        part = sock.recv(BUFF_SIZE)
-        data += part
-        print(part)
-        if len(part) < BUFF_SIZE:
-            # either 0 or end of data
-            break
-    return data
-
-
-def send_command(addr: str, command: str) -> str:
-    if len(addr.split(":")) == 2:
-        family = socket.AF_INET
-        addr_parts = addr.split(":")
-        a = (addr_parts[0], int(addr_parts[1]))
-    else:
-        a = addr
-        family = socket.AF_UNIX
-    unix_socket = socket.socket(family, socket.SOCK_STREAM)
-    unix_socket.settimeout(10)
-    unix_socket.connect(a)
-
-    unix_socket.send(encode_command(command))
-
-    return recvall(unix_socket).decode("utf-8")
+class HAProxyOutput(StrEnum):
+    SERVER_REGISTERED = "New server registered."
+    SERVER_DELETED = "Server deleted."
+    SERVER_NOT_FOUND = "No such server."
 
 
 @app.command()
@@ -100,7 +43,7 @@ def run(
         str | None,
         typer.Option(
             "--sentinel-password",
-            "-p",
+            "-P",
             help="Sentinel Password",
             envvar="SENTINEL_PASSWORD",
             hide_input=True,
@@ -149,18 +92,31 @@ def run(
     )
     address = None
     sentinel_info: dict[str, Any] = conn.info()  # type: ignore
-    for k in sentinel_info.keys():
-        if k.startswith("master") and sentinel_info[k]["name"] == master_name:
-            address = sentinel_info[k]["address"]
-    info(address)
-    info(send_command(haproxy_socket, f"del server {
-         haproxy_backend}/{haproxy_server_name}"))
-    info(send_command(haproxy_socket,
-         f"add server {haproxy_backend}/{haproxy_server_name} {address}"))
+    try:
+        master_id = [k for k in sentinel_info.keys()
+                     if k.startswith("master") and
+                     sentinel_info[k]["name"] == master_name][1]
+    except IndexError:
+        raise Exception("Unable to find given master by name")
+    address = sentinel_info[master_id]["address"]
+    info(f"Setting initial master address: {address}")
+
+    # Remove server in case of restarts
+    out = send_command(haproxy_socket, f"del server {
+        haproxy_backend}/{haproxy_server_name}")
+    if out not in {HAProxyOutput.SERVER_DELETED,
+                   HAProxyOutput.SERVER_NOT_FOUND}:
+        raise Exception(f"Error while removing old server: {out}")
+    out = send_command(haproxy_socket,
+                       f"add server {haproxy_backend}/{haproxy_server_name} {address}")  # noqa: E501
+    if out != HAProxyOutput.SERVER_REGISTERED:
+        raise Exception(f"Error while adding initial server: {out}")
+    info(out)
     pubsub = conn.pubsub()
     pubsub.subscribe("+switch-master")
     for message in pubsub.listen():
         if not isinstance(message["data"], str):
+            info("Skipping initial message in Pub/Sub")
             continue
         data: list[str] = message["data"].split(" ")
         if data[0] != master_name:
@@ -170,7 +126,9 @@ def run(
         port = data[4]
         info("Master Changed, Terminating clients")
         info(send_command(haproxy_socket,
+             "set server redis_master/current_master state maint"))
+        info(send_command(haproxy_socket,
              "shutdown sessions server redis_master/current_master"))
         info(f"Switching to new master Host: {host}, Port: {port}")
         info(send_command(haproxy_socket,
-                          f"set {haproxy_backend}/{haproxy_server_name} addr {host} port {port}"))  # noqa: E501
+                          f"set server {haproxy_backend}/{haproxy_server_name} addr {host} port {port}"))  # noqa: E501

@@ -14,6 +14,8 @@ frontend redis_master
     default_backend redis_master
 
 backend redis_master
+    balance source
+    hash-type consistent
 ```
 
 Is enough
@@ -35,7 +37,7 @@ To run this project install `poetry` (and run `poetry install`) or use `direnv` 
   [env var: `SENTINEL_PORT`]  
   [default: `26379`]
 
-- `--sentinel-password` `-p` `TEXT`  
+- `--sentinel-password` `-P` `TEXT`  
   Sentinel Password  
   [env var: `SENTINEL_PASSWORD`]  
   [default: `None`]
@@ -81,4 +83,5 @@ With the help of Redis Pub/Sub we are able to understand master changes live tha
 
 ## TODO
 
-* [ ] Add error handling for HAProxy commands
+* [x] Add error handling for HAProxy commands
+
