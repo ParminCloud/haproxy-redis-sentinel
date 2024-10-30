@@ -95,7 +95,7 @@ def run(
     try:
         master_id = [k for k in sentinel_info.keys()
                      if k.startswith("master") and
-                     sentinel_info[k]["name"] == master_name][1]
+                     sentinel_info[k]["name"] == master_name][0]
     except IndexError:
         raise Exception("Unable to find given master by name")
     address = sentinel_info[master_id]["address"]
