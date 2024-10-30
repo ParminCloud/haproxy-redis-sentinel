@@ -1,0 +1,35 @@
+on:
+  release:
+    types: [created]
+
+permissions:
+    contents: write
+    packages: write
+
+jobs:
+  changelog-builder:
+    name: Build Changelog
+    runs-on: ubuntu-latest
+    steps:
+    - name: Build Changelog
+      uses: mikepenz/release-changelog-builder-action@v5
+      id: builder
+      with:
+        mode: "COMMIT"
+        configurationJson: |
+          {
+            "template": "\n#{{UNCATEGORIZED}}\n"
+          }
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Add Test Report to Release
+      uses: irongut/EditRelease@v1.2.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        id: ${{ github.event.release.id }}
+        replacebody: true
+        body: |
+          Downlaod binary according to your needs or use Container image from GitHub packages
+
+          ## Changelog
+          ${{ steps.builder.outputs.changelog }}

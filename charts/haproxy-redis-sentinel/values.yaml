@@ -1,5 +1,8 @@
 replicaCount: 1
 
+fullnameOverride: ""
+nameOverride: ""
+
 haproxy:
   image:
     repository: docker.io/library/haproxy

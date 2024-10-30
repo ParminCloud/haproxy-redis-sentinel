@@ -1,5 +1,9 @@
 # HAProxy Redis Sentinel
 
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/haproxy-redis-sentinel)](https://artifacthub.io/packages/search?repo=haproxy-redis-sentinel)
+[![Latest release](https://img.shields.io/github/release/ParminCloud/haproxy-redis-sentinel.svg)](https://github.com/ParminCloud/haproxy-redis-sentinel/releases)
+
+
 Python pub/sub based Sentinel master change notifier that updates HAProxy using it's [Runtime API](https://www.haproxy.com/documentation/haproxy-runtime-api/)
 
 Just create a simple HAProxy config and it will handle everything for you
@@ -70,6 +74,19 @@ compose.yaml file is present is project root
 Set/Change env vars and run it or add this project as a service to your existing setup
 
 > You need HAProxy in a seperated Container/Server
+
+### K8s
+
+```shell
+helm repo add haproxy-redis-sentinel https://parmincloud.github.io/haproxy-redis-sentinel/
+helm repo update
+```
+
+Create a file names `values.yaml` and customize values (according to [defualt values](./charts/haproxy-redis-sentinel/values.yaml))
+
+```
+helm install haproxy-redis-sentinel haproxy-redis-sentinel/haproxy-redis-sentinel --values ./values.yaml
+```
 
 ## Why?
 
