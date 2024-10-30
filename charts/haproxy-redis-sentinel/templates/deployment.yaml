@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ include "haproxy-redis-sentinel.fullname" . }}
+        {{- include "haproxy-redis-sentinel.selectorLabels" . | nindent 8 }}
     spec:
       containers:
         - name: haproxy
