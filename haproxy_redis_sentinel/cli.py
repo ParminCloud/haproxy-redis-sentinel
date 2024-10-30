@@ -104,13 +104,15 @@ def run(
 
     # Remove server in case of restarts
     out = send_command(haproxy_socket, f"del server {
-        haproxy_backend}/{haproxy_server_name}")
+                       haproxy_backend}/{haproxy_server_name}")
     if out not in {HAProxyOutput.SERVER_DELETED,
                    HAProxyOutput.SERVER_NOT_FOUND,
                    HAProxyOutput.BACKEND_NOT_FOUND}:
         raise Exception(f"Error while removing old server: {out}")
     out = send_command(haproxy_socket,
                        f"add server {haproxy_backend}/{haproxy_server_name} {address}")  # noqa: E501
+    info(send_command(haproxy_socket,
+                      f"enable server {haproxy_backend}/{haproxy_server_name} {address}"))  # noqa: E501
     if out != HAProxyOutput.SERVER_REGISTERED:
         raise Exception(f"Error while adding initial server: {out}")
     info(out)
@@ -128,9 +130,8 @@ def run(
         port = data[4]
         info("Master Changed, Terminating clients")
         info(send_command(haproxy_socket,
-             "set server redis_master/current_master state maint"))
-        info(send_command(haproxy_socket,
-             "shutdown sessions server redis_master/current_master"))
+             [f"set server {haproxy_backend}/current_master state maint",
+              f"shutdown sessions server {haproxy_backend}/current_master"]))
         info(f"Switching to new master Host: {host}, Port: {port}")
         info(send_command(haproxy_socket,
-                          f"set server {haproxy_backend}/{haproxy_server_name} addr {host} port {port}"))  # noqa: E501
+                          f"set server {haproxy_backend}/{haproxy_server_name} addr {host} port {port} state ready"))  # noqa: E501
