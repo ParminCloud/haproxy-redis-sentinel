@@ -29,7 +29,5 @@ jobs:
         id: ${{ github.event.release.id }}
         replacebody: true
         body: |
-          Downlaod binary according to your needs or use Container image from GitHub packages
-
           ## Changelog
           ${{ steps.builder.outputs.changelog }}
