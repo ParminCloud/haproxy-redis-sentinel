@@ -3,6 +3,15 @@ entries:
   haproxy-redis-sentinel:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2024-10-30T10:38:07.259134302Z"
+    description: A Helm chart for HAProxy with Redis Sentinel
+    digest: c4c024bea485ea32079710cd7a94413078acfa13441afea4ac806a2f0c813ca2
+    name: haproxy-redis-sentinel
+    urls:
+    - https://github.com/ParminCloud/haproxy-redis-sentinel/releases/download/chart-0.0.2/haproxy-redis-sentinel-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2024-10-30T09:54:14.261751228Z"
     description: A Helm chart for HAProxy with Redis Sentinel
     digest: 27f96959e3b872cf7431d567422548cf4721e7799d069b4fc2b090050dcc4373
@@ -19,4 +28,4 @@ entries:
     urls:
     - https://github.com/ParminCloud/haproxy-redis-sentinel/releases/download/chart-0.0.0/haproxy-redis-sentinel-0.0.0.tgz
     version: 0.0.0
-generated: "2024-10-30T09:54:14.2617634Z"
+generated: "2024-10-30T10:38:07.259141446Z"
