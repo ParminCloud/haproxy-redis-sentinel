@@ -11,7 +11,10 @@ data:
       stats timeout 2m
 
     frontend redis_master
-      bind *:637
-      balance source
-      hash-type consistent
+      bind *:6379
+      default_backend redis_master
+
+    backend redis_master
+        balance source
+        hash-type consistent
 
