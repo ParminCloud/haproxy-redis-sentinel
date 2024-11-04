@@ -107,9 +107,9 @@ def run(
                        f"set server {
                            haproxy_backend}/{haproxy_server_name} state maint",
                        f"del server {haproxy_backend}/{haproxy_server_name}"])
-    if out not in {HAProxyOutput.SERVER_DELETED,
-                   HAProxyOutput.SERVER_NOT_FOUND,
-                   HAProxyOutput.BACKEND_NOT_FOUND}:
+    if any(item in out for item in {HAProxyOutput.SERVER_DELETED,
+                                    HAProxyOutput.SERVER_NOT_FOUND,
+                                    HAProxyOutput.BACKEND_NOT_FOUND}):
         raise Exception(f"Error while removing old server: {out}")
     out = send_command(haproxy_socket,
                        f"add server {haproxy_backend}/{haproxy_server_name} {address}")  # noqa: E501
@@ -132,7 +132,7 @@ def run(
         port = data[4]
         info("Master Changed, Terminating clients")
         info(send_command(haproxy_socket,
-             [f"set server {haproxy_backend}/{haproxy_server_name} state maint",
+                          [f"set server {haproxy_backend}/{haproxy_server_name} state maint",  # noqa: E501
               f"shutdown sessions server {haproxy_backend}/{haproxy_server_name}"]))  # noqa: E501
         info(f"Switching to new master Host: {host}, Port: {port}")
         info(send_command(haproxy_socket,
