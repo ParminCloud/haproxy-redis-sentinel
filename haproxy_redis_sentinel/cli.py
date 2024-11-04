@@ -103,8 +103,10 @@ def run(
     info(f"Setting initial master address: {address}")
 
     # Remove server in case of restarts
-    out = send_command(haproxy_socket, f"del server {
-                       haproxy_backend}/{haproxy_server_name}")
+    out = send_command(haproxy_socket, [
+                       f"set server {
+                           haproxy_backend}/{haproxy_server_name} state maint",
+                       f"del server {haproxy_backend}/{haproxy_server_name}"])
     if out not in {HAProxyOutput.SERVER_DELETED,
                    HAProxyOutput.SERVER_NOT_FOUND,
                    HAProxyOutput.BACKEND_NOT_FOUND}:
@@ -130,8 +132,8 @@ def run(
         port = data[4]
         info("Master Changed, Terminating clients")
         info(send_command(haproxy_socket,
-             [f"set server {haproxy_backend}/current_master state maint",
-              f"shutdown sessions server {haproxy_backend}/current_master"]))
+             [f"set server {haproxy_backend}/{haproxy_server_name} state maint",
+              f"shutdown sessions server {haproxy_backend}/{haproxy_server_name}"]))  # noqa: E501
         info(f"Switching to new master Host: {host}, Port: {port}")
         info(send_command(haproxy_socket,
                           f"set server {haproxy_backend}/{haproxy_server_name} addr {host} port {port} state ready"))  # noqa: E501
