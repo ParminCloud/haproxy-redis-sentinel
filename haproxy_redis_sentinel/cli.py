@@ -107,9 +107,10 @@ def run(
                        f"set server {
                            haproxy_backend}/{haproxy_server_name} state maint",
                        f"del server {haproxy_backend}/{haproxy_server_name}"])
-    if not any(item in out for item in {HAProxyOutput.SERVER_DELETED,
-                                        HAProxyOutput.SERVER_NOT_FOUND,
-                                        HAProxyOutput.BACKEND_NOT_FOUND}):
+    if len(out) > 0 and \
+        not any(item in out for item in {HAProxyOutput.SERVER_DELETED,
+                                         HAProxyOutput.SERVER_NOT_FOUND,
+                                         HAProxyOutput.BACKEND_NOT_FOUND}):
         raise Exception(f"Error while removing old server: {out}")
     out = send_command(haproxy_socket,
                        f"add server {haproxy_backend}/{haproxy_server_name} {address}")  # noqa: E501
