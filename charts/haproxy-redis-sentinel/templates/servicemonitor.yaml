@@ -1,0 +1,17 @@
+{{- if and .Values.haproxy.stats.enabled .Values.haproxy.stats.metrics.enabled .Values.haproxy.stats.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "haproxy-redis-sentinel.labels" . | nindent 4 }}
+  name: {{ include "haproxy-redis-sentinel.fullname" . }}
+spec:
+  endpoints:
+    - path: /metrics
+      port: stats
+      scheme: http
+  jobLabel: {{ include "haproxy-redis-sentinel.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "haproxy-redis-sentinel.selectorLabels" . | nindent 6 }}
+{{- end }}
