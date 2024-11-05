@@ -1,25 +1,45 @@
+# -- number of replicas for deployment
 replicaCount: 1
 
+# -- overrides name of the components entirely
 fullnameOverride: ""
+# -- overrides name of the chart
 nameOverride: ""
 
 haproxy:
+  # -- HAProxy Image
   image:
     repository: docker.io/library/haproxy
     tag: bookworm
     pullPolicy: "IfNotPresent"
-  service:
+  stats:
+    # -- Enables HAProxy Stats
     enabled: true
+    # -- Stats refresh interval
+    refresh: 10
+    metrics:
+      # -- Enables stats metrics for HAProxy
+      enabled: true
+      serviceMonitor:
+        # -- Enables Prometheus operator serviceMonitor to point to stats metrics
+        enabled: true
+  service:
+    # -- Service Type
     type: ClusterIP
+    # -- Redis Master connection service port
     port: 6379
     # -- HAProxy stats port (if enabled)
     statsPort: 8404
 
 haproxyRedisSentinel:
   image:
+    # -- haproxy-redis-sentinel image repository
     repository: ghcr.io/parmincloud/haproxy-redis-sentinel
+    # -- haproxy-redis-sentinel image tag (defaults to appVersion of chart)
     tag: ""
+    # -- haproxy-redis-sentinel image pullPolicy (set to Always if you want to use branched tags)
     pullPolicy: "IfNotPresent"
+  # -- Redis Sentinel information
   sentinel:
     password: ""
     host: ""
