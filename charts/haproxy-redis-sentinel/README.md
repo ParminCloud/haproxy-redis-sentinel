@@ -1,8 +1,21 @@
 # haproxy-redis-sentinel
 
-![Version: 0.0.11](https://img.shields.io/badge/Version-0.0.11-informational?style=flat-square) ![AppVersion: 0.0.8](https://img.shields.io/badge/AppVersion-0.0.8-informational?style=flat-square)
+![Version: 0.0.11](https://img.shields.io/badge/Version-0.0.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.8](https://img.shields.io/badge/AppVersion-0.0.8-informational?style=flat-square)
 
 A Helm chart for HAProxy with Redis Sentinel
+
+**Homepage:** <https://github.com/ParminCloud/haproxy-redis-sentinel>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| ParminCloud | <info@parmin.cloud> | <https://github.com/ParminCloud> |
+| Muhammed Hussein Karimi | <info@karimi.dev> | <https://github.com/mhkarimi1383> |
+
+## Source Code
+
+* <https://github.com/ParminCloud/haproxy-redis-sentinel>
 
 ## Values
 

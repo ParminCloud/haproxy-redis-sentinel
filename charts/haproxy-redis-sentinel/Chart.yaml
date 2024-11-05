@@ -3,4 +3,20 @@ name: haproxy-redis-sentinel
 description: A Helm chart for HAProxy with Redis Sentinel
 version: 0.0.11
 appVersion: "0.0.8"
+sources:
+  - https://github.com/ParminCloud/haproxy-redis-sentinel
+maintainers:
+  - name: ParminCloud
+    url: https://github.com/ParminCloud
+    email: info@parmin.cloud
+  - name: Muhammed Hussein Karimi
+    url: https://github.com/mhkarimi1383
+    email: info@karimi.dev
+type: application
+home: https://github.com/ParminCloud/haproxy-redis-sentinel
+keywords:
+  - haproxy
+  - redis
+  - sentinel
+  - redis-sentinel
 
