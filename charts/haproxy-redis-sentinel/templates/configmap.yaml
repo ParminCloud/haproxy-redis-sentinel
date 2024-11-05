@@ -10,6 +10,20 @@ data:
       stats socket /var/run/haproxy/haproxy.sock user haproxy group haproxy mode 660 level admin
       stats timeout 2m
 
+    {{- if .Values.haproxy.stats.enabled }}
+
+    frontend stats
+      bind *:8404
+      mode http
+      option http-use-htx
+      stats enabled
+      stats uri /
+      {{- if .Values.haproxy.stats.metrics.enabled }}
+      http-request use-service prometheus-exporter if { path /metrics }
+      {{- end }}
+      stats refresh {{ .Values.haproxy.stats.refresh }}
+    {{- end }}
+
     frontend redis_master
       bind *:6379
       default_backend redis_master

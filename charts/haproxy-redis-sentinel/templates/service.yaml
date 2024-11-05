@@ -11,5 +11,12 @@ spec:
       targetPort: redis
       protocol: TCP
       name: redis
+    {{- if .Values.haproxy.stats.enabled }}
+    - port: {{ .Values.haproxy.service.statsPort }}
+      targetPort: stats
+      protocol: TCP
+      name: stats
+    {{- end }}
+  sessionAffinity: ClientIP
   selector:
     {{- include "haproxy-redis-sentinel.selectorLabels" . | nindent 4 }}

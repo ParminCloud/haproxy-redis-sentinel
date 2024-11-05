@@ -12,6 +12,8 @@ haproxy:
     enabled: true
     type: ClusterIP
     port: 6379
+    # -- HAProxy stats port (if enabled)
+    statsPort: 8404
 
 haproxyRedisSentinel:
   image:
