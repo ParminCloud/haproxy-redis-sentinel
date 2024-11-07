@@ -1,6 +1,6 @@
 # haproxy-redis-sentinel
 
-![Version: 0.0.12](https://img.shields.io/badge/Version-0.0.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.8](https://img.shields.io/badge/AppVersion-0.0.8-informational?style=flat-square)
+![Version: 0.0.14](https://img.shields.io/badge/Version-0.0.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.9](https://img.shields.io/badge/AppVersion-0.0.9-informational?style=flat-square)
 
 A Helm chart for HAProxy with Redis Sentinel
 
@@ -8,7 +8,7 @@ A Helm chart for HAProxy with Redis Sentinel
 
 ## Compatibility
 
-This chart can be used alongside every charts that provide access to Redis Sentinel service, For example [DandyDeveloper's redis-ha](https://github.com/DandyDeveloper/charts/tree/master/charts/redis-ha) chart
+This chart can be used alongside every chart that provides access to Redis Sentinel service, For example [DandyDeveloper's redis-ha](https://github.com/DandyDeveloper/charts/tree/master/charts/redis-ha) chart
 
 ## Maintainers
 
