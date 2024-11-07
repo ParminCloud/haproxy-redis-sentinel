@@ -1,7 +1,7 @@
 { pkgs, lib, config, inputs, ... }:
 
 {
-  packages = with pkgs; [ git ];
+  packages = with pkgs; [ git helm-docs ];
 
   # languages.rust.enable = true;
   languages = {
