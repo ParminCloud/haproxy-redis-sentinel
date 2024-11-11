@@ -33,9 +33,11 @@ spec:
           image: {{ .Values.haproxyRedisSentinel.image.repository }}:{{ .Values.haproxyRedisSentinel.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.haproxyRedisSentinel.image.pullPolicy }}
           ports:
+            {{- if .Values.haproxy.stats.enabled }}
             - name: stats
               containerPort: 8404
               protocol: TCP
+            {{- end }}
             - name: redis
               containerPort: 6379
               protocol: TCP
