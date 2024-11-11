@@ -1,6 +1,6 @@
 # haproxy-redis-sentinel
 
-![Version: 0.0.14](https://img.shields.io/badge/Version-0.0.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.9](https://img.shields.io/badge/AppVersion-0.0.9-informational?style=flat-square)
+![Version: 0.0.16](https://img.shields.io/badge/Version-0.0.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.9](https://img.shields.io/badge/AppVersion-0.0.9-informational?style=flat-square)
 
 A Helm chart for HAProxy with Redis Sentinel
 
@@ -32,7 +32,7 @@ This chart can be used alongside every chart that provides access to Redis Senti
 | haproxy.service.type | string | `"ClusterIP"` | Service Type |
 | haproxy.stats.enabled | bool | `true` | Enables HAProxy Stats |
 | haproxy.stats.metrics.enabled | bool | `true` | Enables stats metrics for HAProxy |
-| haproxy.stats.metrics.serviceMonitor.enabled | bool | `true` | Enables Prometheus operator serviceMonitor to point to stats metrics |
+| haproxy.stats.metrics.serviceMonitor.enabled | bool | `false` | Enables Prometheus operator serviceMonitor to point to stats metrics |
 | haproxy.stats.refresh | int | `10` | Stats refresh interval |
 | haproxyRedisSentinel.image.pullPolicy | string | `"IfNotPresent"` | haproxy-redis-sentinel image pullPolicy (set to Always if you want to use branched tags) |
 | haproxyRedisSentinel.image.repository | string | `"ghcr.io/parmincloud/haproxy-redis-sentinel"` | haproxy-redis-sentinel image repository |

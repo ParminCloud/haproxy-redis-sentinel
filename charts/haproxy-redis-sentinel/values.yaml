@@ -22,7 +22,7 @@ haproxy:
       enabled: true
       serviceMonitor:
         # -- Enables Prometheus operator serviceMonitor to point to stats metrics
-        enabled: true
+        enabled: false
   service:
     # -- Service Type
     type: ClusterIP
