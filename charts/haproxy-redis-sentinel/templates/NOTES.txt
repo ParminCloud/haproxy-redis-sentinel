@@ -1,0 +1,12 @@
+Thank you for installing {{ .Chart.Name }}.
+
+To use the created service within your cluster use the following information
+
+Hostname: `{{ include "haproxy-redis-sentinel.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local`
+Port: `{{ .Values.haproxy.service.port }}`
+
+To connect to the service from your local machine run
+
+```shell
+kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "haproxy-redis-sentinel.fullname" . }} {{ .Values.haproxy.service.port }}
+```
