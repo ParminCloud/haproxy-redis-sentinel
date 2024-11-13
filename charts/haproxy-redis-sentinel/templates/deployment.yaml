@@ -18,8 +18,6 @@ spec:
         - name: haproxy
           image: {{ .Values.haproxy.image.repository }}:{{ .Values.haproxy.image.tag }}
           imagePullPolicy: {{ .Values.haproxy.image.pullPolicy }}
-          ports:
-            - containerPort: {{ .Values.haproxy.service.port }}
           volumeMounts:
             - name: haproxy-socket
               mountPath: /var/run/haproxy/
