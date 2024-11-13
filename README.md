@@ -101,4 +101,4 @@ With the help of Redis Pub/Sub we are able to understand master changes live tha
 ## TODO
 
 * [x] Add error handling for HAProxy commands
-* [ ] Add probes to K8s Chart
+* [ ] Add probes and resources to K8s Chart
