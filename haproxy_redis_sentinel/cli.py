@@ -94,9 +94,11 @@ def run(
     address = None
     sentinel_info: dict[str, Any] = conn.info()  # type: ignore
     try:
-        master_id = [k for k in sentinel_info.keys()
-                     if k.startswith("master") and
-                     sentinel_info[k]["name"] == master_name][0]
+        master_id = [
+            k for k in sentinel_info.keys()
+            if k.startswith("master") and
+            sentinel_info[k]["name"] == master_name
+        ][0]
     except IndexError:
         raise Exception("Unable to find given master by name")
     address = sentinel_info[master_id]["address"]
@@ -104,9 +106,10 @@ def run(
 
     # Remove server in case of restarts
     out = send_command(haproxy_socket, [
-                       f"set server {
-                           haproxy_backend}/{haproxy_server_name} state maint",
-                       f"del server {haproxy_backend}/{haproxy_server_name}"])
+        f"set server {haproxy_backend}/{haproxy_server_name} state maint",
+        f"shutdown sessions server {haproxy_backend}/{haproxy_server_name}",
+        f"del server {haproxy_backend}/{haproxy_server_name}",
+    ])
     if len(out) > 0 and \
         not any(item in out for item in {HAProxyOutput.SERVER_DELETED,
                                          HAProxyOutput.SERVER_NOT_FOUND,
@@ -132,9 +135,12 @@ def run(
         host = data[3]
         port = data[4]
         info("Master Changed, Terminating clients")
-        info(send_command(haproxy_socket,
-                          [f"set server {haproxy_backend}/{haproxy_server_name} state maint",  # noqa: E501
-              f"shutdown sessions server {haproxy_backend}/{haproxy_server_name}"]))  # noqa: E501
+        info(send_command(haproxy_socket, [
+                f"set server {haproxy_backend}/{haproxy_server_name} state maint",  # noqa: E501
+                f"shutdown sessions server {haproxy_backend}/{haproxy_server_name}",  # noqa: E501
+        ]))
         info(f"Switching to new master Host: {host}, Port: {port}")
-        info(send_command(haproxy_socket,
-                          f"set server {haproxy_backend}/{haproxy_server_name} addr {host} port {port} state ready"))  # noqa: E501
+        info(send_command(haproxy_socket, [
+                            f"set server {haproxy_backend}/{haproxy_server_name} addr {host} port {port}",  # noqa: E501
+                            f"set server {haproxy_backend}/{haproxy_server_name} state ready",  # noqa: E501
+                          ]))
