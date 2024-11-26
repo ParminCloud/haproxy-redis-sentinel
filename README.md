@@ -1,5 +1,9 @@
 # HAProxy Redis Sentinel
 
+<p align="center" width="100%">
+    <img width="33%" src="./docs/icon.png">
+</p>
+
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/haproxy-redis-sentinel)](https://artifacthub.io/packages/search?repo=haproxy-redis-sentinel)
 [![Latest release](https://img.shields.io/github/release/ParminCloud/haproxy-redis-sentinel.svg)](https://github.com/ParminCloud/haproxy-redis-sentinel/releases)
 
