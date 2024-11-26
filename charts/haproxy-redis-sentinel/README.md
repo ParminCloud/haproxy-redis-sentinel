@@ -1,6 +1,10 @@
 # haproxy-redis-sentinel
 
-![Version: 0.0.16](https://img.shields.io/badge/Version-0.0.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.9](https://img.shields.io/badge/AppVersion-0.0.9-informational?style=flat-square)
+<p align="center" width="100%">
+    <img width="33%" src="https://raw.githubusercontent.com/ParminCloud/haproxy-redis-sentinel/master/docs/icon.png">
+</p>
+
+![Version: 0.0.20](https://img.shields.io/badge/Version-0.0.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.10](https://img.shields.io/badge/AppVersion-0.0.10-informational?style=flat-square)
 
 A Helm chart for HAProxy with Redis Sentinel
 
