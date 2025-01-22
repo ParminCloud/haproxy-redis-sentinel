@@ -1,7 +1,7 @@
 apiVersion: v2
 name: haproxy-redis-sentinel
 description: A Helm chart for HAProxy with Redis Sentinel
-version: 0.0.20
+version: 0.0.21
 appVersion: "0.0.10"
 icon: https://raw.githubusercontent.com/ParminCloud/haproxy-redis-sentinel/master/docs/icon.png
 sources:

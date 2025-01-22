@@ -24,12 +24,6 @@ spec:
             - name: haproxy-config
               mountPath: /usr/local/etc/haproxy/haproxy.cfg
               subPath: haproxy.cfg
-          securityContext:
-            runAsUser: 0
-
-        - name: haproxy-redis-sentinel
-          image: {{ .Values.haproxyRedisSentinel.image.repository }}:{{ .Values.haproxyRedisSentinel.image.tag | default .Chart.AppVersion }}
-          imagePullPolicy: {{ .Values.haproxyRedisSentinel.image.pullPolicy }}
           ports:
             {{- if .Values.haproxy.stats.enabled }}
             - name: stats
@@ -39,6 +33,20 @@ spec:
             - name: redis
               containerPort: 6379
               protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          securityContext:
+            runAsUser: 0
+
+        - name: haproxy-redis-sentinel
+          image: {{ .Values.haproxyRedisSentinel.image.repository }}:{{ .Values.haproxyRedisSentinel.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.haproxyRedisSentinel.image.pullPolicy }}
           env:
             - name: SENTINEL_PASSWORD
               value: {{ .Values.haproxyRedisSentinel.sentinel.password | quote }}
