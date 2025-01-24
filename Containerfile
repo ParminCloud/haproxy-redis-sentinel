@@ -1,4 +1,4 @@
-FROM docker.io/library/python:3.12
+FROM docker.io/library/python:3.12-slim
 
 ENV PYTHONPATH=${PYTHONPATH}:${PWD}
 
@@ -9,6 +9,6 @@ WORKDIR /app
 COPY . /app/
 
 RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
+RUN poetry install
 
 ENTRYPOINT [ "poetry", "run", "haproxy-redis-sentinel" ]
