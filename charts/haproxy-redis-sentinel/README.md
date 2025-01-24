@@ -4,7 +4,7 @@
     <img width="33%" src="https://raw.githubusercontent.com/ParminCloud/haproxy-redis-sentinel/master/docs/icon.png">
 </p>
 
-![Version: 0.0.20](https://img.shields.io/badge/Version-0.0.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.10](https://img.shields.io/badge/AppVersion-0.0.10-informational?style=flat-square)
+![Version: 0.0.21](https://img.shields.io/badge/Version-0.0.21-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
 A Helm chart for HAProxy with Redis Sentinel
 
@@ -30,7 +30,9 @@ This chart can be used alongside every chart that provides access to Redis Senti
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | fullnameOverride | string | `""` | overrides name of the components entirely |
-| haproxy.image | object | `{"pullPolicy":"IfNotPresent","repository":"docker.io/library/haproxy","tag":"bookworm"}` | HAProxy Image |
+| haproxy.image | object | `{"pullPolicy":"IfNotPresent","repository":"docker.io/library/haproxy","tag":"3.1-bookworm"}` | HAProxy Image |
+| haproxy.maxConn | string | `nil` | Sets MaxConnections on HAProxy |
+| haproxy.resources | object | `{}` | HAProxy resources |
 | haproxy.service.port | int | `6379` | Redis Master connection service port |
 | haproxy.service.statsPort | int | `8404` | HAProxy stats port (if enabled) |
 | haproxy.service.type | string | `"ClusterIP"` | Service Type |
@@ -38,11 +40,15 @@ This chart can be used alongside every chart that provides access to Redis Senti
 | haproxy.stats.metrics.enabled | bool | `true` | Enables stats metrics for HAProxy |
 | haproxy.stats.metrics.serviceMonitor.enabled | bool | `false` | Enables Prometheus operator serviceMonitor to point to stats metrics |
 | haproxy.stats.refresh | int | `10` | Stats refresh interval |
+| haproxy.timeouts.client | string | `"330s"` | HAProxy Client timeout |
+| haproxy.timeouts.connect | string | `"4s"` | HAProxy Connect timeout |
+| haproxy.timeouts.server | string | `"330s"` | HAProxy Server timeout |
 | haproxyRedisSentinel.image.pullPolicy | string | `"IfNotPresent"` | haproxy-redis-sentinel image pullPolicy (set to Always if you want to use branched tags) |
 | haproxyRedisSentinel.image.repository | string | `"ghcr.io/parmincloud/haproxy-redis-sentinel"` | haproxy-redis-sentinel image repository |
 | haproxyRedisSentinel.image.tag | string | `""` | haproxy-redis-sentinel image tag (defaults to appVersion of chart) |
+| haproxyRedisSentinel.resources | object | `{}` | haproxy-redis-sentinel resources |
 | haproxyRedisSentinel.sentinel | object | `{"host":"","masterName":"mymaster","password":"","port":""}` | Redis Sentinel information |
-| nameOverride | string | `""` | overrides name of the chart |
+| nameOverride | string | `""` | overrides name of the suffix used for resources (defaults to `haproxy`) |
 | replicaCount | int | `1` | number of replicas for deployment |
 
 ----------------------------------------------

@@ -3,15 +3,24 @@ replicaCount: 1
 
 # -- overrides name of the components entirely
 fullnameOverride: ""
-# -- overrides name of the chart
+# -- overrides name of the suffix used for resources (defaults to `haproxy`)
 nameOverride: ""
 
 haproxy:
   # -- HAProxy Image
   image:
     repository: docker.io/library/haproxy
-    tag: bookworm
+    tag: 3.1-bookworm
     pullPolicy: "IfNotPresent"
+  timeouts:
+    # -- HAProxy Connect timeout
+    connect: 4s
+    # -- HAProxy Server timeout
+    server: 330s
+    # -- HAProxy Client timeout
+    client: 330s
+  # -- Sets MaxConnections on HAProxy
+  maxConn: null
   stats:
     # -- Enables HAProxy Stats
     enabled: true
@@ -30,6 +39,8 @@ haproxy:
     port: 6379
     # -- HAProxy stats port (if enabled)
     statsPort: 8404
+  # -- HAProxy resources
+  resources: {}
 
 haproxyRedisSentinel:
   image:
@@ -45,4 +56,5 @@ haproxyRedisSentinel:
     host: ""
     port: ""
     masterName: "mymaster"
-
+  # -- haproxy-redis-sentinel resources
+  resources: {}

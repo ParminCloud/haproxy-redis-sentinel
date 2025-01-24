@@ -10,6 +10,28 @@ data:
       stats socket /var/run/haproxy/haproxy.sock user haproxy group haproxy mode 660 level admin
       stats timeout 2m
 
+    defaults
+      mode tcp
+      timeout connect {{ .Values.haproxy.timeouts.connect }}
+      timeout server {{ .Values.haproxy.timeouts.server }}
+      timeout client {{ .Values.haproxy.timeouts.client }}
+      {{- if .Values.haproxy.maxConn | kindIs "int" }}
+      maxconn {{ .Values.haproxy.maxConn }}
+      {{- end }}
+
+    frontend livez
+      bind *:8888
+      mode http
+      monitor-uri /livez
+      option      dontlognull
+
+    frontend readyz
+      bind *:8889
+      mode http
+      monitor-uri /readyz
+      monitor fail if { nbsrv(redis_master_server) eq 0 }
+      option      dontlognull
+
     {{ if .Values.haproxy.stats.enabled -}}
     frontend stats
       bind *:8404
@@ -24,9 +46,9 @@ data:
 
     frontend redis_master
       bind *:6379
-      default_backend redis_master
+      default_backend redis_master_server
 
-    backend redis_master
+    backend redis_master_server
         balance source
         hash-type consistent
 

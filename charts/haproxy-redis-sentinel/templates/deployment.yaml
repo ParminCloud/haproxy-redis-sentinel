@@ -16,6 +16,8 @@ spec:
     spec:
       containers:
         - name: haproxy
+          resources:
+{{ toYaml .Values.haproxy.resources | default "{}" | indent 11 }}
           image: {{ .Values.haproxy.image.repository }}:{{ .Values.haproxy.image.tag }}
           imagePullPolicy: {{ .Values.haproxy.image.pullPolicy }}
           volumeMounts:
@@ -33,18 +35,30 @@ spec:
             - name: redis
               containerPort: 6379
               protocol: TCP
-          livenessProbe:
-            failureThreshold: 3
-            tcpSocket:
-              port: 6379
+            - name: readyz
+              containerPort: 8889
+              protocol: TCP
+            - name: livez
+              containerPort: 8888
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              port: readyz
+              path: /readyz
             initialDelaySeconds: 5
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              port: livez
+              path: /livez
+            initialDelaySeconds: 10
+            periodSeconds: 3
           securityContext:
             runAsUser: 0
 
         - name: haproxy-redis-sentinel
+          resources:
+{{ toYaml .Values.haproxyRedisSentinel.resources | default "{}" | indent 11 }}
           image: {{ .Values.haproxyRedisSentinel.image.repository }}:{{ .Values.haproxyRedisSentinel.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.haproxyRedisSentinel.image.pullPolicy }}
           env:
@@ -56,6 +70,8 @@ spec:
               value: {{ .Values.haproxyRedisSentinel.sentinel.port | quote }}
             - name: MASTER_NAME
               value: {{ .Values.haproxyRedisSentinel.sentinel.masterName }}
+            - name: HAPROXY_BACKEND
+              value: redis_master_server
           volumeMounts:
             - name: haproxy-socket
               mountPath: /var/run/haproxy/
