@@ -50,7 +50,7 @@ haproxyRedisSentinel:
     tag: ""
     # -- haproxy-redis-sentinel image pullPolicy (set to Always if you want to use branched tags)
     pullPolicy: "IfNotPresent"
-  # -- Redis Sentinel information
+  # -- Redis Sentinel information (Supports templating)
   sentinel:
     password: ""
     host: ""
