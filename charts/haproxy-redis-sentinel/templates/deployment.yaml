@@ -63,11 +63,15 @@ spec:
           imagePullPolicy: {{ .Values.haproxyRedisSentinel.image.pullPolicy }}
           env:
             - name: SENTINEL_PASSWORD
-              value: {{ tpl (.Values.haproxyRedisSentinel.sentinel.password | quote) . }}
+              value: {{ tpl (.Values.haproxyRedisSentinel.sentinel.password) . }}
             - name: SENTINEL_HOST
               value: {{ tpl .Values.haproxyRedisSentinel.sentinel.host . }}
             - name: SENTINEL_PORT
+              {{- if .Values.haproxyRedisSentinel.sentinel.port | kindIs "int" }}
               value: {{ tpl (.Values.haproxyRedisSentinel.sentinel.port | quote) . }}
+              {{- else }}
+              value: {{ tpl (.Values.haproxyRedisSentinel.sentinel.port) . }}
+              {{- end }}
             - name: MASTER_NAME
               value: {{ tpl .Values.haproxyRedisSentinel.sentinel.masterName . }}
             - name: HAPROXY_BACKEND
