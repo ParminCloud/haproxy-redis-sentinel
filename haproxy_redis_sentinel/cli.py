@@ -1,7 +1,7 @@
 from enum import StrEnum
 from haproxy_redis_sentinel.logging import info
 from haproxy_redis_sentinel.utils import send_command
-from redis.backoff import ExponentialBackoff
+from redis.backoff import FullJitterBackoff
 from redis.retry import Retry
 from typing import Annotated, Any
 import redis
@@ -89,7 +89,7 @@ def run(
         port=sentinel_port,
         password=sentinel_password,
         decode_responses=True,
-        retry=Retry(ExponentialBackoff(), 3),
+        retry=Retry(FullJitterBackoff(), 5),
     )
     address = None
     sentinel_info: dict[str, Any] = conn.info()  # type: ignore
@@ -111,14 +111,20 @@ def run(
         f"del server {haproxy_backend}/{haproxy_server_name}",
     ])
     if len(out) > 0 and \
-        not any(item in out for item in {HAProxyOutput.SERVER_DELETED,
-                                         HAProxyOutput.SERVER_NOT_FOUND,
-                                         HAProxyOutput.BACKEND_NOT_FOUND}):
+            not any(item in out for item in {
+                HAProxyOutput.SERVER_DELETED,
+                HAProxyOutput.SERVER_NOT_FOUND,
+                HAProxyOutput.BACKEND_NOT_FOUND
+            }):
         raise Exception(f"Error while removing old server: {out}")
-    out = send_command(haproxy_socket,
-                       f"add server {haproxy_backend}/{haproxy_server_name} {address}")  # noqa: E501
-    info(send_command(haproxy_socket,
-                      f"enable server {haproxy_backend}/{haproxy_server_name} {address}"))  # noqa: E501
+    out = send_command(
+        haproxy_socket,
+        f"add server {haproxy_backend}/{haproxy_server_name} {address}"
+    )
+    info(send_command(
+        haproxy_socket,
+        f"enable server {haproxy_backend}/{haproxy_server_name} {address}"
+    ))
     if out != HAProxyOutput.SERVER_REGISTERED:
         raise Exception(f"Error while adding initial server: {out}")
     info(out)
@@ -140,7 +146,11 @@ def run(
                 f"shutdown sessions server {haproxy_backend}/{haproxy_server_name}",  # noqa: E501
         ]))
         info(f"Switching to new master Host: {host}, Port: {port}")
-        info(send_command(haproxy_socket, [
-                            f"set server {haproxy_backend}/{haproxy_server_name} addr {host} port {port}",  # noqa: E501
-                            f"set server {haproxy_backend}/{haproxy_server_name} state ready",  # noqa: E501
-                          ]))
+        info(send_command(
+            haproxy_socket,
+            [
+                f"set server {haproxy_backend}/{haproxy_server_name} addr {host}",  # noqa: E501
+                f"set server {haproxy_backend}/{haproxy_server_name} port {port}",  # noqa: E501
+                f"set server {haproxy_backend}/{haproxy_server_name} state ready",  # noqa: E501
+            ]
+        ))
