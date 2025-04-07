@@ -20,6 +20,7 @@ def recvall(sock: socket.socket):
 
 
 def send_command(addr: str, command: str | list[str]) -> str:
+    result = ""
     if len(addr.split(":")) == 2:
         addr_parts = addr.split(":")
         a = (addr_parts[0], int(addr_parts[1]))
@@ -29,9 +30,15 @@ def send_command(addr: str, command: str | list[str]) -> str:
         family = socket.AF_UNIX
     unix_socket = socket.socket(family, socket.SOCK_STREAM)
     unix_socket.settimeout(10)
-    unix_socket.connect(a)
-    if not isinstance(command, str):
-        command = ";".join(command)
-    unix_socket.send(encode_command(command))
-
-    return recvall(unix_socket).decode("utf-8").strip()
+    try:
+        unix_socket.connect(a)
+        if not isinstance(command, str):
+            command = ";".join(command)
+        unix_socket.send(encode_command(command))
+        result = recvall(unix_socket).decode("utf-8").strip()
+    except Exception as e:
+        unix_socket.close()
+        raise e
+    finally:
+        unix_socket.close()
+    return result

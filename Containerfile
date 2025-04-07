@@ -1,14 +1,42 @@
-FROM docker.io/library/python:3.12-slim
+FROM docker.io/python:3.12-slim AS base
 
-ENV PYTHONPATH=${PYTHONPATH}:${PWD}
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN pip3 install poetry
+FROM base AS python-base
+ENV PYTHONUNBUFFERED=1 \
+	PYTHONDONTWRITEBYTECODE=1 \
+	PIP_NO_CACHE_DIR=off \
+	PIP_DISABLE_PIP_VERSION_CHECK=on \
+	PIP_DEFAULT_TIMEOUT=100 \
+	POETRY_HOME="/opt/poetry" \
+	POETRY_VIRTUALENVS_IN_PROJECT=true \
+	POETRY_NO_INTERACTION=1 \
+	PYSETUP_PATH="/opt/pysetup" \
+	VENV_PATH="/opt/pysetup/.venv"
 
-WORKDIR /app
+ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
-COPY . /app/
+FROM python-base AS builder-base
+RUN apt-get update \
+	&& apt-get install --no-install-recommends -y \
+	curl \
+	build-essential
 
-RUN poetry config virtualenvs.create false
-RUN poetry install
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-ENTRYPOINT [ "poetry", "run", "haproxy-redis-sentinel" ]
+WORKDIR $PYSETUP_PATH
+COPY ./poetry.lock ./pyproject.toml ./
+RUN poetry install --only main --no-root
+
+FROM python-base AS production
+
+COPY --from=builder-base $VENV_PATH $VENV_PATH
+
+COPY ./haproxy_redis_sentinel /haproxy_redis_sentinel
+WORKDIR /haproxy_redis_sentinel
+
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["haproxy_redis_sentinel.cli:app"]

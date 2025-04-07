@@ -1,23 +1,10 @@
-from enum import StrEnum
-from haproxy_redis_sentinel.logging import info
-from haproxy_redis_sentinel.utils import send_command
-from redis.backoff import FullJitterBackoff
-from redis.retry import Retry
-from typing import Annotated, Any
-import redis
+from handler import Handler
+from typing import Annotated
 import typer
-
 
 __all__ = ["app"]
 
 app = typer.Typer()
-
-
-class HAProxyOutput(StrEnum):
-    SERVER_REGISTERED = "New server registered."
-    SERVER_DELETED = "Server deleted."
-    SERVER_NOT_FOUND = "No such server."
-    BACKEND_NOT_FOUND = 'No such backend.'
 
 
 @app.command()
@@ -84,73 +71,14 @@ def run(
             rich_help_panel="HAProxy Info"
         )] = "current_master",
 ):
-    conn = redis.Redis(
-        host=sentinel_host,
-        port=sentinel_port,
-        password=sentinel_password,
-        decode_responses=True,
-        retry=Retry(FullJitterBackoff(), 5),
+    handler = Handler(
+        sentinel_host=sentinel_host,
+        sentinel_port=sentinel_port,
+        sentinel_password=sentinel_password,
+        master_name=master_name,
+        haproxy_socket=haproxy_socket,
+        haproxy_backend=haproxy_backend,
+        haproxy_server_name=haproxy_server_name
     )
-    address = None
-    sentinel_info: dict[str, Any] = conn.info()  # type: ignore
-    try:
-        master_id = [
-            k for k in sentinel_info.keys()
-            if k.startswith("master") and
-            sentinel_info[k]["name"] == master_name
-        ][0]
-    except IndexError:
-        raise Exception("Unable to find given master by name")
-    address = sentinel_info[master_id]["address"]
-    info(f"Setting initial master address: {address}")
-
-    # Remove server in case of restarts
-    out = send_command(haproxy_socket, [
-        f"set server {haproxy_backend}/{haproxy_server_name} state maint",
-        f"shutdown sessions server {haproxy_backend}/{haproxy_server_name}",
-        f"del server {haproxy_backend}/{haproxy_server_name}",
-    ])
-    if len(out) > 0 and \
-            not any(item in out for item in {
-                HAProxyOutput.SERVER_DELETED,
-                HAProxyOutput.SERVER_NOT_FOUND,
-                HAProxyOutput.BACKEND_NOT_FOUND
-            }):
-        raise Exception(f"Error while removing old server: {out}")
-    out = send_command(
-        haproxy_socket,
-        f"add server {haproxy_backend}/{haproxy_server_name} {address}"
-    )
-    info(send_command(
-        haproxy_socket,
-        f"enable server {haproxy_backend}/{haproxy_server_name} {address}"
-    ))
-    if out != HAProxyOutput.SERVER_REGISTERED:
-        raise Exception(f"Error while adding initial server: {out}")
-    info(out)
-    pubsub = conn.pubsub()
-    pubsub.subscribe("+switch-master")
-    for message in pubsub.listen():
-        if not isinstance(message["data"], str):
-            info("Skipping initial message in Pub/Sub")
-            continue
-        data: list[str] = message["data"].split(" ")
-        if data[0] != master_name:
-            info("Skipping master change: Master name did not matched")
-            continue
-        host = data[3]
-        port = data[4]
-        info("Master Changed, Terminating clients")
-        info(send_command(haproxy_socket, [
-                f"set server {haproxy_backend}/{haproxy_server_name} state maint",  # noqa: E501
-                f"shutdown sessions server {haproxy_backend}/{haproxy_server_name}",  # noqa: E501
-        ]))
-        info(f"Switching to new master Host: {host}, Port: {port}")
-        info(send_command(
-            haproxy_socket,
-            [
-                f"set server {haproxy_backend}/{haproxy_server_name} addr {host}",  # noqa: E501
-                f"set server {haproxy_backend}/{haproxy_server_name} port {port}",  # noqa: E501
-                f"set server {haproxy_backend}/{haproxy_server_name} state ready",  # noqa: E501
-            ]
-        ))
+    handler.set_initial_server()
+    handler.start_worker()
