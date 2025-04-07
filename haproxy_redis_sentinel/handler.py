@@ -133,10 +133,10 @@ class Handler(object):
                 log_data=False,
             )
         )
-        if stats is None:
+        if stats in (None, [], {}):
             return self.set_initial_server()
         for group in stats:
-            if group is None:
+            if group in (None, [], {}):
                 return self.set_initial_server()
             for item in group:
                 if (item is None) or (not isinstance(item, dict)):
@@ -147,7 +147,7 @@ class Handler(object):
                 if field.get("name") == "addr":
                     addr_value = item.get("value", {}).get("value", "")
                     if not addr_value or len(addr_value) < 0:
-                        self.set_initial_server()
+                        return self.set_initial_server()
 
     def haproxy_server_checker_worker(self):
         while True:
