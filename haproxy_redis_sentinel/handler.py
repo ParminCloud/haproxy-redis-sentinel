@@ -55,9 +55,10 @@ class Handler(object):
 
         return address
 
-    def send_command(self, commands: str | list[str]) -> str:
+    def send_command(self, commands: str | list[str], log_data=True) -> str:
         out = send_command(self.haproxy_socket, commands)
-        info(f"HAProxy command: {commands}, Output: {out}")
+        if log_data:
+            info(f"HAProxy command: {commands}, Output: {out}")
         return out
 
     def shutdown_current_server(self) -> str:
@@ -128,7 +129,8 @@ class Handler(object):
     def haproxy_server_checker(self):
         stats: list[list[dict | None] | None] | None = orjson.loads(
             self.send_command(
-                f"show stat {self.haproxy_backend} 4 -1 json"
+                f"show stat {self.haproxy_backend} 4 -1 json",
+                log_data=False,
             )
         )
         if stats is None:
