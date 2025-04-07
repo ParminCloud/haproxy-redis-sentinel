@@ -82,3 +82,7 @@ def run(
     )
     handler.set_initial_server()
     handler.start_worker()
+
+
+if __name__ == "__main__":
+    app()

@@ -6,7 +6,7 @@ from redis import Redis
 from redis.retry import Retry
 from redis.backoff import FullJitterBackoff
 from multiprocessing import Process
-from logging import info, error
+from logger import info, error
 import orjson
 
 

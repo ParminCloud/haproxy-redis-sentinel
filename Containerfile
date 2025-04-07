@@ -39,4 +39,4 @@ COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["haproxy_redis_sentinel.cli:app"]
+CMD ["/haproxy_redis_sentinel/cli.py"]
