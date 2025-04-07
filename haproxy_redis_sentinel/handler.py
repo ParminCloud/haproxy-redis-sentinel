@@ -146,7 +146,6 @@ class Handler(object):
                     addr_value = item.get("value", {}).get("value", "")
                     if not addr_value or len(addr_value) < 0:
                         self.set_initial_server()
-        return self.set_initial_server()
 
     def haproxy_server_checker_worker(self):
         while True:
