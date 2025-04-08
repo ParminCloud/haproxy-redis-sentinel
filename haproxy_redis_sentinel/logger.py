@@ -3,10 +3,17 @@ import typer
 
 
 def log_prefix() -> str:
-    return f"{datetime.now().strftime("%c")} "
+    """
+    Returns a formatted string with the current date and time.
+    """
+    return f"{datetime.now().strftime('%c')} "
 
 
-def info(msg):
+def info(msg: str):
+    """
+    Prints an info message with a green color.
+        :param msg: Message to print
+    """
     typer.echo(
         log_prefix() + typer.style(
             msg,
@@ -18,6 +25,10 @@ def info(msg):
 
 
 def error(msg: str):
+    """
+    Prints an error message with a red color.
+        :param msg: Message to print
+    """
     typer.echo(
         log_prefix() + typer.style(
             msg,

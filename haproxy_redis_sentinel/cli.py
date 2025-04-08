@@ -71,6 +71,9 @@ def run(
             rich_help_panel="HAProxy Info"
         )] = "current_master",
 ):
+    """
+    Run the HAProxy and Redis Sentinel handler.
+    """
     handler = Handler(
         sentinel_host=sentinel_host,
         sentinel_port=sentinel_port,

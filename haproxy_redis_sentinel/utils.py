@@ -1,13 +1,23 @@
 import socket
 
-__all__ = ["send_command"]
+__all__ = ["send_command", "is_empty"]
 
 
 def encode_command(command: str) -> bytes:
+    """
+    Encode a command string into bytes.
+        :param command: Command string to encode
+        :return: Encoded command as bytes
+    """
     return f"{command};\n".encode("utf-8")
 
 
-def recvall(sock: socket.socket):
+def recvall(sock: socket.socket) -> bytes:
+    """
+    Receive all data from a socket until EOF.
+        :param sock: Socket to receive data from
+        :return: Received data as bytes
+    """
     BUFF_SIZE = 1024
     data = b''
     while True:
@@ -20,6 +30,12 @@ def recvall(sock: socket.socket):
 
 
 def send_command(addr: str, command: str | list[str]) -> str:
+    """
+    Send a command to a socket address and return the response.
+        :param addr: Socket address (IP:port or path)
+        :param command: Command to send (string or list of strings)
+        :return: Response from the socket
+    """
     result = ""
     if len(addr.split(":")) == 2:
         addr_parts = addr.split(":")
@@ -42,3 +58,12 @@ def send_command(addr: str, command: str | list[str]) -> str:
     finally:
         unix_socket.close()
     return result
+
+
+def is_empty(value):
+    """
+    Check if a value is empty.
+        :param value: Value to check
+        :return: True if empty, False otherwise
+    """
+    return value in (None, "", [], {})
