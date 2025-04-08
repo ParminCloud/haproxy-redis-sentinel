@@ -156,8 +156,7 @@ class Handler(object):
             host = gethostbyname(host)
         self.send_command(
             [
-                f"set server {self.haproxy_backend}/{self.haproxy_server_name} addr {host}",  # noqa: E501
-                f"set server {self.haproxy_backend}/{self.haproxy_server_name} port {port}",  # noqa: E501
+                f"set server {self.haproxy_backend}/{self.haproxy_server_name} addr {host} port {port}",  # noqa: E501
                 f"set server {self.haproxy_backend}/{self.haproxy_server_name} state ready",  # noqa: E501
             ]
         )
