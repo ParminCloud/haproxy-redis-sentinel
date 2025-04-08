@@ -1,6 +1,19 @@
 import socket
+import re
 
-__all__ = ["send_command", "is_empty"]
+__all__ = ["send_command", "is_empty", "is_ipv4"]
+
+
+def is_ipv4(ip: str) -> bool:
+    """
+    Check if a given string is a valid IP address.
+        :param ip: IP address to check
+        :return: True if valid, False otherwise
+    """
+    pattern = re.compile(
+        r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"  # noqa: E501
+    )
+    return bool(pattern.match(ip))
 
 
 def encode_command(command: str) -> bytes:

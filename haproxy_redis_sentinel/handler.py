@@ -1,7 +1,8 @@
+from socket import gethostbyname
 from time import sleep
 from typing import Any
 from enum import StrEnum
-from utils import send_command, is_empty
+from utils import is_ipv4, send_command, is_empty
 from redis import Redis
 from redis.retry import Retry
 from redis.backoff import FullJitterBackoff
@@ -131,6 +132,11 @@ class Handler(object):
         Add a new server to HAProxy (Used for initial sets).
             :param address: Address of the new server
         """
+        host = address.split(":")[0]
+        port = address.split(":")[1]
+        if not is_ipv4(host):
+            host = gethostbyname(host)
+        address = f"{host}:{port}"
         out = self.send_command(
             f"add server {self.haproxy_backend}/{self.haproxy_server_name} {address}"  # noqa: E501
         )
@@ -146,6 +152,8 @@ class Handler(object):
             :param host: Host of the new server
             :param port: Port of the new server
         """
+        if not is_ipv4(host):
+            host = gethostbyname(host)
         self.send_command(
             [
                 f"set server {self.haproxy_backend}/{self.haproxy_server_name} addr {host}",  # noqa: E501
